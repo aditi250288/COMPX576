@@ -1,7 +1,7 @@
 -- Create the database
 CREATE DATABASE IF NOT EXISTS music_website;
 USE music_website;
-
+   
 
 -- Create a users table
 CREATE TABLE IF NOT EXISTS users (
