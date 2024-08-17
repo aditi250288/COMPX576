@@ -85,3 +85,12 @@ CREATE TABLE IF NOT EXISTS album_artists (
 
 );
 
+Create table IF NOT EXISTS playlist_song(
+    playlist_id int,
+    song_id,
+    PRIMARY key(playlist_id,song_id),
+    FOREIGN key(playlist_id) REFERENCES playlists(playlist_id),
+    FOREIGN key(song_id) REFERENCES songs(song_id)
+);
+
+
