@@ -6,6 +6,8 @@ import Player from "../player/player";
 import Favourites from "../favourites/favourites";
 import Trending from "../trending/trending";
 import Login from "../login/LoginForm";
+import Playlist from "../Playlists/Playlist";
+
 
 export default function Home() {
     return (
@@ -18,6 +20,7 @@ export default function Home() {
                     <Route path="/trending" element={<Trending />} />
                     <Route path="/player" element={<Player />} />
                     <Route path="/favourites" element={<Favourites />} />
+                    <Route path="/Playlists/:id" element={<Playlist />} />
                 </Routes>
             </div>
         </Router>

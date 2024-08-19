@@ -1,11 +1,19 @@
 const express = require('express');
 require('dotenv').config();
-const database = require('./config/database');
+const database = require('./database');
 const cors = require('cors');
 const axios = require('axios');
 
+const SpotifyWebApi = require('spotify-web-api-node');
+
 const app = express();
 const port = process.env.PORT || 3000;
+
+const spotifyApi = new SpotifyWebApi({
+  clientId: process.env.SPOTIFY_CLIENT_ID,
+  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+  redirectUri: process.env.SPOTIFY_REDIRECT_URI
+});
 
 // Middleware
 app.use(cors());
@@ -33,9 +41,9 @@ app.use('/api/artists', artistRoutes);
 const albumRoutes = require('./routes/albums');
 app.use('/api/albums', albumRoutes);
 
-// Amazon Music routes
-const amazonMusicRoutes = require('./routes/amazonMusic');
-app.use('/api/amazon-music', amazonMusicRoutes);
+// Spotify routes
+const spotifyRoutes = require('./routes/spotifyMusic');
+app.use('/api/spotify', spotifyRoutes);
 
 // Test route for database connection
 app.get('/test-db', async (req, res) => {
