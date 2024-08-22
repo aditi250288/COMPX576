@@ -1,5 +1,5 @@
 // models/Song.js
-const pool = require('../database');
+const pool = require('../config/database');
 
 class Song {
   constructor(song_id, song_title, album_id, artist_id, url, duration, release_date, playlist_id) {

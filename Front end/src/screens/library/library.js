@@ -13,7 +13,7 @@ export default function Library() {
   const fetchSongs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3000/api/songs');
+      const response = await axios.get('http://localhost:3000/artists');
       setSongs(response.data);
       setLoading(false);
     } catch (err) {

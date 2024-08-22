@@ -1,6 +1,6 @@
 // C:\Users\Admin\Music Website\Backend\controllers\playlistsController.js
 
-const db = require('../database');  // Adjust the path as needed
+const db = require('../config/database');  // Adjust the path as needed
 
 // Get all playlists
 exports.getAllPlaylists = async (req, res) => {

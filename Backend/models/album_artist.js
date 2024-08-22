@@ -1,4 +1,4 @@
-const pool = require('../database');
+const pool = require('../config/database');
 
 class AlbumArtist {
   static async getAlbumsByArtist(artistId) {

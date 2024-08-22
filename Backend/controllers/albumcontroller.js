@@ -1,6 +1,6 @@
 // C:\Users\Admin\Music Website\Backend\controllers\albumController.js
 
-const db = require('../database');
+const db = require('../config/database');
 
 // Get all albums
 exports.getAllAlbums = async (req, res) => {
