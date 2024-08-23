@@ -1,4 +1,4 @@
-const pool = require('../database');
+const pool = require('../config/database');
 
 class Like {
   static async addLike(userId, songId, albumId, playlistId) {

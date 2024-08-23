@@ -1,4 +1,4 @@
-const pool = require('../database');
+const pool = require('../config/database');
 
 class Playlist {
   static async createPlaylist(playlistName, userId, image) {
@@ -47,7 +47,6 @@ class Playlist {
     return rows;
   }
 
-  // Additional function to get playlists with user information
   static async getPlaylistsWithUserInfo() {
     const [rows] = await pool.query(`
       SELECT p.*, u.username 
@@ -57,7 +56,6 @@ class Playlist {
     return rows;
   }
 
-  // Function to add a song to a playlist (assuming you have a playlist_songs table)
   static async addSongToPlaylist(playlistId, songId) {
     const [result] = await pool.query(
       'INSERT INTO playlist_songs (playlist_id, song_id) VALUES (?, ?)',
@@ -66,7 +64,6 @@ class Playlist {
     return result.insertId;
   }
 
-  // Function to remove a song from a playlist
   static async removeSongFromPlaylist(playlistId, songId) {
     const [result] = await pool.query(
       'DELETE FROM playlist_songs WHERE playlist_id = ? AND song_id = ?',
@@ -75,7 +72,6 @@ class Playlist {
     return result.affectedRows;
   }
 
-  // Function to get all songs in a playlist
   static async getSongsInPlaylist(playlistId) {
     const [rows] = await pool.query(`
       SELECT s.* 

@@ -1,23 +1,43 @@
-const express = require('express');
 require('dotenv').config();
-const database = require('./config/database');
+const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const database = require('./config/database');
 const axios = require('axios');
-
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Check for required environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not set. Please check your .env file.');
+  process.exit(1);
+}
+
+// Initialize Spotify API
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
   redirectUri: process.env.SPOTIFY_REDIRECT_URI
 });
 
+if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET || !process.env.SPOTIFY_REDIRECT_URI) {
+  console.error('Spotify API credentials are missing. Please check your .env file.');
+}
+
 // Middleware
-app.use(cors());
+app.use(helmet());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  optionsSuccessStatus: 200
+}));
 app.use(express.json());
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+}));
 
 // Axios middleware
 app.use((req, res, next) => {
@@ -25,25 +45,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Auth routes
-const authRoutes = require('./routes/auth');
-app.use('/auth', authRoutes);
-
-// Song routes
-const songRoutes = require('./routes/songs');
-app.use('/api/songs', songRoutes);
-
-// Artist routes
-const artistRoutes = require('./routes/artists');
-app.use('/api/artists', artistRoutes);
-
-// Album routes
-const albumRoutes = require('./routes/albums');
-app.use('/api/albums', albumRoutes);
-
-// Spotify routes
-const spotifyRoutes = require('./routes/spotifyMusic');
-app.use('/api/spotify', spotifyRoutes);
+// API Routes
+app.use('/auth', require('./routes/auth')); // for login and register
+app.use('/api/users', require('./routes/users')); // For user-related operations
+app.use('/api/songs', require('./routes/songs'));
+app.use('/api/artists', require('./routes/artists'));
+app.use('/api/albums', require('./routes/albums'));
+app.use('/api/spotify', require('./routes/spotifyMusic'));
+app.use('/api/playlists', require('./routes/playlists'));
 
 // Test route for database connection
 app.get('/test-db', async (req, res) => {
@@ -52,40 +61,57 @@ app.get('/test-db', async (req, res) => {
     res.json({ message: 'Database connection successful', result: results[0].solution });
   } catch (error) {
     console.error('Database query error:', error);
-    res.status(500).send('Database connection failed');
+    res.status(500).json({ message: 'Database connection failed', error: error.message });
   }
 });
 
 // Example route using Axios
 app.get('/test-axios', async (req, res) => {
   try {
-    const response = await req.axios.get('https://api.example.com/data');
+    const response = await axios.get('https://api.example.com/data');
     res.json(response.data);
   } catch (error) {
+    console.error('Axios request error:', error);
     res.status(500).json({ message: 'Error fetching data', error: error.message });
   }
 });
 
-// Example route
+// Home route
 app.get('/', (req, res) => {
   res.send('Music Website Backend is running');
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  console.error('Unhandled error:', err);
+  res.status(500).json({ 
+    message: 'An unexpected error occurred', 
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message 
+  });
 });
 
-// Start the server
-database.getConnection()
-  .then(() => {
+// Database connection function
+const connectToDatabase = async () => {
+  try {
+    await database.getConnection();
     console.log('Connected to database.');
+  } catch (err) {
+    console.error('Error connecting to database:', err);
+    process.exit(1);
+  }
+};
+
+// Start the server
+const startServer = async () => {
+  try {
+    await connectToDatabase();
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
-  })
-  .catch((err) => {
-    console.error('Error connecting to the database:', err);
+  } catch (err) {
+    console.error('Error starting server:', err);
     process.exit(1);
-  });
+  }
+};
+
+startServer();

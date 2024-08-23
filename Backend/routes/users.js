@@ -3,6 +3,9 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const { authenticateToken } = require('../middleware/auth');
 
+// Create a new user (sign-up) - typically doesn't require authentication
+router.post('/', userController.createUser);
+
 // Get all users (admin only)
 router.get('/', authenticateToken, userController.getAllUsers);
 
@@ -20,5 +23,8 @@ router.get('/:id/playlists', authenticateToken, userController.getUserPlaylists)
 
 // Get user's liked items
 router.get('/:id/likes', authenticateToken, userController.getUserLikes);
+
+// Verify user's email
+router.post('/:id/verify-email', authenticateToken, userController.verifyEmail);
 
 module.exports = router;

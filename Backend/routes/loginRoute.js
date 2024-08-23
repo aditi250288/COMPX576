@@ -5,7 +5,7 @@ const { authenticateToken, validateInput, generateToken } = require('../middlewa
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const users = await User.getAllUsers(); // Implement this method in your User model
+    const users = await User.getAllUsers();
     res.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -33,20 +33,13 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await User.getUserByUsername(username);
     
-    if (!user) {
+    if (!user || !await User.verifyPassword(password, user.password_hash)) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
-    const isPasswordValid = await User.verifyPassword(password, user.password_hash);
-    
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid username or password' });
-    }
-
-    // Use the generateToken function from middleware
     const token = generateToken(user);
 
-    res.json({ message: 'Login successful', token, userId: user.user_id });
+    res.json({ message: 'Login successful', token, userId: user.id });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Error during login', error: error.message });

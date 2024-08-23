@@ -1,4 +1,4 @@
-// models/Song.js
+// songs.js
 const pool = require('../config/database');
 
 class Song {
@@ -96,4 +96,3 @@ class Song {
 }
 
 module.exports = Song;
-

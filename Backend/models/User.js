@@ -1,4 +1,4 @@
-// models/User.js
+// models/user.js
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
@@ -91,10 +91,29 @@ class User {
     }
   }
 
-  static async verifyEmail(userId) {
+  static async verifyEmail(userId, verificationCode) {
     try {
+      // You might want to check the verification code here
       const [result] = await pool.query('UPDATE users SET email_verified = TRUE WHERE user_id = ?', [userId]);
-      return result.affectedRows;
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getUserPlaylists(userId) {
+    try {
+      const [rows] = await pool.query('SELECT * FROM playlists WHERE user_id = ?', [userId]);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getUserLikes(userId) {
+    try {
+      const [rows] = await pool.query('SELECT * FROM likes WHERE user_id = ?', [userId]);
+      return rows;
     } catch (error) {
       throw error;
     }
