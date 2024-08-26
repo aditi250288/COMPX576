@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const spotifyMusicController = require('../controllers/spotifyMusicController');
 
+// Add the test route
+router.get('/test', spotifyMusicController.testSpotifyAPI);
+
 // Get information about a track
 router.get('/tracks/:trackId', spotifyMusicController.getTrackInfo);
 

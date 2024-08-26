@@ -1,4 +1,4 @@
-// C:\Users\Admin\Music Website\Backend\controllers\musicApi.js
+// C:\Users\Admin\Music Website\Backend\controllers\spotifyMusicController.js
 
 const SpotifyWebApi = require('spotify-web-api-node');
 require('dotenv').config();
@@ -10,13 +10,23 @@ const spotifyApi = new SpotifyWebApi({
   redirectUri: process.env.SPOTIFY_REDIRECT_URI
 });
 
-const refreshSpotifyAccessToken = async () => {
+let tokenExpirationEpoch;
+
+const setAccessToken = async () => {
   try {
-    const data = await spotifyApi.refreshAccessToken();
+    const data = await spotifyApi.clientCredentialsGrant();
     spotifyApi.setAccessToken(data.body['access_token']);
+    tokenExpirationEpoch = new Date().getTime() / 1000 + data.body['expires_in'];
+    console.log('Access token has been set');
   } catch (error) {
-    console.error('Error refreshing Spotify access token:', error);
+    console.error('Error getting Spotify access token:', error);
     throw error;
+  }
+};
+
+const refreshSpotifyAccessToken = async () => {
+  if (!tokenExpirationEpoch || new Date().getTime() / 1000 > tokenExpirationEpoch) {
+    await setAccessToken();
   }
 };
 
@@ -32,7 +42,24 @@ const spotifyApiRequest = async (apiCall) => {
   }
 };
 
-// Spotify API methods
+// Test function
+exports.testSpotifyAPI = async (req, res) => {
+  try {
+    await refreshSpotifyAccessToken();
+    const data = await spotifyApiRequest(() => spotifyApi.getArtist('4Z8W4fKeB5YxbusRsdQVPb')); // Radiohead's Spotify ID
+    res.json({
+      message: 'Spotify API is working correctly',
+      artist: data.body
+    });
+  } catch (error) {
+    console.error('Error testing Spotify API:', error);
+    res.status(500).json({
+      message: 'Error testing Spotify API',
+      error: error.message
+    });
+  }
+};
+
 exports.getTrackInfo = async (req, res) => {
   try {
     const data = await spotifyApiRequest(() => spotifyApi.getTrack(req.params.trackId));

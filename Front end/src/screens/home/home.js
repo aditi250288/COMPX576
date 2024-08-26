@@ -7,7 +7,8 @@ import Favourites from "../favourites/favourites";
 import Trending from "../trending/trending";
 import Login from "../login/LoginForm";
 import Playlist from "../Playlists/Playlist";
-
+import ProtectedRoute from "../../components/protectedRoutes";
+import Register from "../register/register";
 
 export default function Home() {
     return (
@@ -15,12 +16,13 @@ export default function Home() {
             <div className="main-body">
                 <Routes>
                     <Route path="/" element={<Login />} />
-                    <Route path="/library" element={<Library />} />
-                    <Route path="/feed" element={<Feed />} />
-                    <Route path="/trending" element={<Trending />} />
-                    <Route path="/player" element={<Player />} />
-                    <Route path="/favourites" element={<Favourites />} />
-                    <Route path="/Playlists/:id" element={<Playlist />} />
+                    <Route path="/register" element={<Register />} /> {/* Add this line */}
+                    <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+                    <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+                    <Route path="/trending" element={<ProtectedRoute><Trending /></ProtectedRoute>} />
+                    <Route path="/player" element={<ProtectedRoute><Player /></ProtectedRoute>} />
+                    <Route path="/favourites" element={<ProtectedRoute><Favourites /></ProtectedRoute>} />
+                    <Route path="/Playlists/:id" element={<ProtectedRoute><Playlist /></ProtectedRoute>} />
                 </Routes>
             </div>
         </Router>

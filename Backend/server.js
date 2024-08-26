@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const database = require('./config/database');
 const axios = require('axios');
 const SpotifyWebApi = require('spotify-web-api-node');
+const searchRoutes = require('./routes/search');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -51,8 +52,21 @@ app.use('/api/users', require('./routes/users')); // For user-related operations
 app.use('/api/songs', require('./routes/songs'));
 app.use('/api/artists', require('./routes/artists'));
 app.use('/api/albums', require('./routes/albums'));
-app.use('/api/spotify', require('./routes/spotifyMusic'));
+//app.use('/api/spotify', require('./routes/spotifyMusic'));
+// Modify this line in your server.js
+app.use('/api/spotify', (req, res, next) => {
+  console.log('Spotify route accessed:', req.method, req.url);
+  next();
+}, require('./routes/spotifyMusic'));
 app.use('/api/playlists', require('./routes/playlists'));
+app.use('/api/search', searchRoutes);
+
+
+// Add this near your other route definitions
+app.get('/test', (req, res) => {
+  console.log('Test route hit');
+  res.json({ message: 'Server is working' });
+});
 
 // Test route for database connection
 app.get('/test-db', async (req, res) => {
@@ -79,6 +93,11 @@ app.get('/test-axios', async (req, res) => {
 // Home route
 app.get('/', (req, res) => {
   res.send('Music Website Backend is running');
+});
+
+// 404 handler
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Not Found' });
 });
 
 // Global error handler

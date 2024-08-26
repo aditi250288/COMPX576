@@ -1,3 +1,14 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background: url('../../components/assets/background.jpg');
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .wrapper {
     width: 420px;
     background: transparent;
@@ -88,6 +99,18 @@ color: #fff;
     font-size: 16px;
     color: #333;
     font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.wrapper button.forgot-password {
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.wrapper button.forgot-password:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .wrapper .register-link {
