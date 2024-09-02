@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const spotifyMusicController = require('../controllers/spotifyMusicController');
+const userController = require('../controllers/userController')
+const {authenticateToken, checkSpotifyToken} = require('../middleware/auth');
+const auth = require('../middleware/auth');
+
 
 // Add the test route
 router.get('/test', spotifyMusicController.testSpotifyAPI);
@@ -26,5 +30,12 @@ router.get('/playlists', spotifyMusicController.getUserPlaylists);
 
 // Get tracks from a playlist
 router.get('/playlists/:playlistId/tracks', spotifyMusicController.getPlaylistTracks);
+
+router.get('/library', authenticateToken, checkSpotifyToken, spotifyMusicController.getUserLibrary);
+
+router.post('/update-spotify-token', authenticateToken, userController.updateSpotifyToken);
+
+
+
 
 module.exports = router;

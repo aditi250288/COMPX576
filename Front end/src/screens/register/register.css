@@ -2,7 +2,7 @@ body {
     margin: 0; /* Remove default margin */
     padding: 0; /* Remove default padding */
     height: 100vh; /* Full height */
-    background: url('../../components/assets/registration page.jpg'); /* Adjust the path as needed */
+    background: url('../../components/assets/background.jpg'); /* Adjust the path as needed */
     background-size: cover; /* Cover the entire background */
 
 }

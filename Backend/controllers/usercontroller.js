@@ -1,25 +1,25 @@
+// Required modules
 const user = require('../models/user');
 const playlists = require('../models/playlists');
 const likes = require('../models/likes');
-const artists = require('../models/artists');
-const albums = require('../models/albums');
-const album_artists = require('../models/album_artist');
-const songs = require('../models/songs');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // Create a new user
 exports.createUser = async (req, res) => {
     const { username, email, password } = req.body;
-
     if (!username || !email || !password) {
         return res.status(400).json({ message: 'Username, email, and password are required' });
     }
 
     try {
+        // Check if user exists in your MySQL database
         const existingUser = await user.getUserByUsername(username);
         if (existingUser) {
             return res.status(409).json({ message: 'Username already exists' });
         }
 
+        // Create user in MySQL database
         const userId = await user.createUser({ username, email, password });
         res.status(201).json({ userId, message: 'User created successfully' });
     } catch (error) {
@@ -58,7 +58,6 @@ exports.getUserById = async (req, res) => {
 exports.updateUser = async (req, res) => {
     const userId = req.params.id;
     const { username, email, password } = req.body;
-
     if (!userId) {
         return res.status(400).json({ message: 'User ID is required' });
     }
@@ -81,11 +80,9 @@ exports.updateUser = async (req, res) => {
 
     try {
         const affectedRows = await user.updateUser(userId, { username, email, password });
-
         if (affectedRows === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
-
         res.json({ message: 'User updated successfully' });
     } catch (error) {
         console.error('Error updating user:', error.message);
@@ -132,19 +129,58 @@ exports.getUserLikes = async (req, res) => {
     }
 };
 
+// Login user
+exports.loginUser = async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    try {
+        const foundUser = await user.getUserByUsername(username);
+        if (!foundUser) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, foundUser.password_hash);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+
+        const token = jwt.sign(
+            { userId: foundUser.user_id, username: foundUser.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.json({
+            message: 'Login successful',
+            token,
+            user: {
+                userId: foundUser.user_id,
+                username: foundUser.username,
+                email: foundUser.email
+            }
+        });
+    } catch (error) {
+        console.error('Error during login:', error.message);
+        res.status(500).json({ message: 'Failed to login', error: error.message });
+    }
+};
+
 // Verify a user's email
 exports.verifyEmail = async (req, res) => {
     const userId = req.params.id;
     const { verificationCode } = req.body;
-
+    
     if (!userId) {
         return res.status(400).json({ message: 'User ID is required' });
     }
-
+    
     if (!verificationCode) {
         return res.status(400).json({ message: 'Verification code is required' });
     }
-
+    
     try {
         const result = await user.verifyEmail(userId, verificationCode);
         if (result) {
@@ -157,3 +193,22 @@ exports.verifyEmail = async (req, res) => {
         res.status(500).json({ message: 'Failed to verify email', error: error.message });
     }
 };
+
+exports.updateSpotifyToken = async (req, res) => {
+    const userId = req.user.id; // Assuming you have the user's ID from authentication
+    const { spotifyToken } = req.body;
+  
+    if (!spotifyToken) {
+      return res.status(400).json({ message: 'Spotify token is required' });
+    }
+  
+    try {
+      await user.setSpotifyToken(userId, spotifyToken);
+      res.json({ message: 'Spotify token updated successfully' });
+    } catch (error) {
+      console.error('Error updating Spotify token:', error.message);
+      res.status(500).json({ message: 'Failed to update Spotify token', error: error.message });
+    }
+  };
+
+module.exports = exports;

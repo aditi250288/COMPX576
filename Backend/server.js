@@ -7,9 +7,10 @@ const database = require('./config/database');
 const axios = require('axios');
 const SpotifyWebApi = require('spotify-web-api-node');
 const searchRoutes = require('./routes/search');
+const authRoutes = require('./routes/auth');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 // Check for required environment variables
 if (!process.env.JWT_SECRET) {
@@ -30,10 +31,12 @@ if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET || !pro
 
 // Middleware
 app.use(helmet());
+
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   optionsSuccessStatus: 200
 }));
+
 app.use(express.json());
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -52,21 +55,9 @@ app.use('/api/users', require('./routes/users')); // For user-related operations
 app.use('/api/songs', require('./routes/songs'));
 app.use('/api/artists', require('./routes/artists'));
 app.use('/api/albums', require('./routes/albums'));
-//app.use('/api/spotify', require('./routes/spotifyMusic'));
-// Modify this line in your server.js
-app.use('/api/spotify', (req, res, next) => {
-  console.log('Spotify route accessed:', req.method, req.url);
-  next();
-}, require('./routes/spotifyMusic'));
+app.use('/api/spotify', require('./routes/spotifyMusic'));
 app.use('/api/playlists', require('./routes/playlists'));
 app.use('/api/search', searchRoutes);
-
-
-// Add this near your other route definitions
-app.get('/test', (req, res) => {
-  console.log('Test route hit');
-  res.json({ message: 'Server is working' });
-});
 
 // Test route for database connection
 app.get('/test-db', async (req, res) => {

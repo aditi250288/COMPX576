@@ -1,4 +1,3 @@
-// models/user.js
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
@@ -122,8 +121,6 @@ class User {
     }
   }
 
-  // New Spotify-related methods
-
   static async getUserBySpotifyId(spotifyId) {
     try {
       const [rows] = await pool.query('SELECT * FROM users WHERE spotify_id = ?', [spotifyId]);
@@ -157,18 +154,6 @@ class User {
     }
   }
 
-  static async updateSpotifyAccessToken(userId, accessToken) {
-    try {
-      const [result] = await pool.query(
-        'UPDATE users SET spotify_access_token = ? WHERE user_id = ?',
-        [accessToken, userId]
-      );
-      return result.affectedRows > 0;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   static async linkSpotifyAccount(userId, spotifyId, accessToken, refreshToken) {
     try {
       const [result] = await pool.query(
@@ -188,6 +173,30 @@ class User {
         [userId]
       );
       return result.affectedRows > 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async setSpotifyToken(userId, spotifyToken) {
+    try {
+      const [result] = await pool.query(
+        'UPDATE users SET spotify_access_token = ? WHERE user_id = ?',
+        [spotifyToken, userId]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getSpotifyToken(userId) {
+    try {
+      const [rows] = await pool.query(
+        'SELECT spotify_access_token FROM users WHERE user_id = ?',
+        [userId]
+      );
+      return rows[0] ? rows[0].spotify_access_token : null;
     } catch (error) {
       throw error;
     }

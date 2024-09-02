@@ -1,0 +1,31 @@
+.not-found {
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    height: 100vh; /* Full viewport height */
+    background-color:transparent; /* Dark background */
+    color: white; /* White text color */
+    text-align: center; /* Center text */
+    font-family: Arial, sans-serif; /* Font style */
+}
+
+.not-found h1 {
+    font-size: 3rem; /* Large font size for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+}
+
+.not-found p {
+    font-size: 1.5rem; /* Font size for the paragraph */
+    margin-bottom: 30px; /* Space below the paragraph */
+}
+
+.not-found a {
+    color: #1e90ff; /* Bright blue color for the link */
+    text-decoration: none; /* Remove underline from the link */
+    font-size: 1.2rem; /* Font size for the link */
+}
+
+.not-found a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
