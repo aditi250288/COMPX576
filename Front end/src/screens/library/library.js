@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { SPOTIFY_CLIENT_ID } from 'Front end\.env'
 
 const axiosInstance = axios.create({
   baseURL: 'https://api.spotify.com/v1/',

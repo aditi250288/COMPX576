@@ -7,6 +7,7 @@ import { useNavigate, Link } from "react-router-dom";
 // Spotify authorization constants
 const authEndpoint = "https://accounts.spotify.com/authorize?";
 const clientId = "414414d8645b4746a08bc76b9abd6809";
+// const clientSecret = ""
 const redirectUri = "http://localhost:3000"; // Make sure this matches your Spotify app settings
 const scopes = ["user-library-read", "playlist-read-private", "user-read-private"];
 
@@ -19,6 +20,8 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  console.log("in login");
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");

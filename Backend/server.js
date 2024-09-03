@@ -2,10 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+//const rateLimit = require('express-rate-limit');
 const database = require('./config/database');
 const axios = require('axios');
-const SpotifyWebApi = require('spotify-web-api-node');
+//const SpotifyWebApi = require('spotify-web-api-node');
 const searchRoutes = require('./routes/search');
 const authRoutes = require('./routes/auth');
 
@@ -19,15 +19,15 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Initialize Spotify API
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.SPOTIFY_REDIRECT_URI
-});
+//const spotifyApi = new SpotifyWebApi({
+ // clientId: process.env.SPOTIFY_CLIENT_ID,
+ // clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+ // redirectUri: process.env.SPOTIFY_REDIRECT_URI
+//});
 
-if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET || !process.env.SPOTIFY_REDIRECT_URI) {
-  console.error('Spotify API credentials are missing. Please check your .env file.');
-}
+//if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET || !process.env.SPOTIFY_REDIRECT_URI) {
+  //console.error('Spotify API credentials are missing. Please check your .env file.');
+//}
 
 // Middleware
 app.use(helmet());
@@ -37,11 +37,11 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-app.use(express.json());
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-}));
+//app.use(express.json());
+//app.use(rateLimit({
+//  windowMs: 15 * 60 * 1000, // 15 minutes
+ // max: 100 // limit each IP to 100 requests per windowMs
+//}));
 
 // Axios middleware
 app.use((req, res, next) => {
@@ -55,7 +55,7 @@ app.use('/api/users', require('./routes/users')); // For user-related operations
 app.use('/api/songs', require('./routes/songs'));
 app.use('/api/artists', require('./routes/artists'));
 app.use('/api/albums', require('./routes/albums'));
-app.use('/api/spotify', require('./routes/spotifyMusic'));
+//app.use('/api/spotify', require('./routes/spotifyMusic'));
 app.use('/api/playlists', require('./routes/playlists'));
 app.use('/api/search', searchRoutes);
 

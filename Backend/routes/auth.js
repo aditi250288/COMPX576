@@ -1,24 +1,32 @@
 const express = require('express');
+var bodyParser = require('body-parser')
 const router = express.Router();
 const User = require('../models/user');
 const { authenticateToken, validateInput, generateToken } = require('../middleware/auth');
-const SpotifyWebApi = require('spotify-web-api-node');
+//const SpotifyWebApi = require('spotify-web-api-node');
 const bcrypt = require('bcrypt');
-const rateLimit = require('express-rate-limit');
+//const rateLimit = require('express-rate-limit');
 
 // Initialize Spotify API
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.SPOTIFY_REDIRECT_URI
-});
+//const spotifyApi = new SpotifyWebApi({
+ // clientId: process.env.SPOTIFY_CLIENT_ID,
+ // clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+ // redirectUri: process.env.SPOTIFY_REDIRECT_URI
+//});
 
 // Rate limiting
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 login requests per windowMs
-  message: 'Too many login attempts, please try again later.'
-});
+//const loginLimiter = rateLimit({
+ // windowMs: 15 * 60 * 1000, // 15 minutes
+//  max: 5, // Limit each IP to 5 login requests per windowMs
+ // message: 'Too many login attempts, please try again later.'
+//});
+
+
+// create application/json parser
+var jsonParser = bodyParser.json()
+ 
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 // Get all users (protected route)
 router.get('/', authenticateToken, async (req, res) => {
@@ -58,9 +66,11 @@ router.post('/register', validateInput, async (req, res) => {
 });
 
 // Login user
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', jsonParser, async (req, res) => {
   try {
+    console.log(req.body);
     const { username, password } = req.body;
+    console.log("new log");
 
     // Validate input
     if (!username || !password) {
@@ -90,6 +100,7 @@ router.post('/login', loginLimiter, async (req, res) => {
       token, 
       user: userWithoutPassword 
     });
+
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Error during login' });
@@ -105,65 +116,66 @@ router.post('/refresh-token', authenticateToken, (req, res) => {
 
 // Logout (client-side)
 router.post('/logout', (req, res) => {
+  
   // JWT tokens can't be invalidated server-side, so we just send a success response
   res.json({ message: 'Logout successful' });
 });
 
 // Spotify login
-router.get('/spotify/login', (req, res) => {
-  const scopes = ['user-read-private', 'user-read-email', 'user-library-read', 'user-library-modify'];
-  const authorizeURL = spotifyApi.createAuthorizeURL(scopes);
-  res.redirect(authorizeURL);
-});
+//router.get('/spotify/login', (req, res) => {
+ // const scopes = ['user-read-private', 'user-read-email', 'user-library-read', 'user-library-modify'];
+  //const authorizeURL = spotifyApi.createAuthorizeURL(scopes);
+  //res.redirect(authorizeURL);
+//});
 
 // Spotify callback
-router.get('/spotify/callback', async (req, res) => {
-  const { code } = req.query;
-  try {
-    const data = await spotifyApi.authorizationCodeGrant(code);
-    const { access_token, refresh_token } = data.body;
+//router.get('/spotify/callback', async (req, res) => {
+  //const { code } = req.query;
+  //try {
+    //const data = await spotifyApi.authorizationCodeGrant(code);
+    //const { access_token, refresh_token } = data.body;
     
-    spotifyApi.setAccessToken(access_token);
-    const spotifyUser = await spotifyApi.getMe();
+    //spotifyApi.setAccessToken(access_token);
+    //const spotifyUser = await spotifyApi.getMe();
     
-    let user = await User.getUserBySpotifyId(spotifyUser.body.id);
+    //let user = await User.getUserBySpotifyId(spotifyUser.body.id);
     
-    if (!user) {
-      user = await User.createUserFromSpotify({
-        spotifyId: spotifyUser.body.id,
-        username: spotifyUser.body.display_name,
-        email: spotifyUser.body.email,
-      });
-    }
+    //if (!user) {
+      //user = await User.createUserFromSpotify({
+        //spotifyId: spotifyUser.body.id,
+        //username: spotifyUser.body.display_name,
+        //email: spotifyUser.body.email,
+      //});
+    //}
     
-    await User.updateSpotifyTokens(user.user_id, access_token, refresh_token);
+   // await User.updateSpotifyTokens(user.user_id, access_token, refresh_token);
     
-    const token = generateToken(user);
+    //const token = generateToken(user);
 
     //Redirect to Spotify library
-    res.redirect(`${process.env.FRONTEND_URL}/library?token=${token}`);
-  } catch (error) {
-    console.error('Error in Spotify callback:', error);
-    res.redirect(`${process.env.FRONTEND_URL}/login-error`);
-  }
-});
+    //res.redirect(`${process.env.FRONTEND_URL}/library?token=${token}`);
+  //} catch (error) {
+    //console.error('Error in Spotify callback:', error);
+    //res.redirect(`${process.env.FRONTEND_URL}/login-error`);
+  //}
+//});
 
 // Refresh Spotify token
-router.get('/refresh-spotify-token', authenticateToken, async (req, res) => {
-  try {
-    const user = await User.getUserById(req.user.id);
-    spotifyApi.setRefreshToken(user.spotify_refresh_token);
+//router.get('/refresh-spotify-token', authenticateToken, async (req, res) => {
+  //try {
+    //const user = await User.getUserById(req.user.id);
+    //spotifyApi.setRefreshToken(user.spotify_refresh_token);
     
-    const data = await spotifyApi.refreshAccessToken();
-    const { access_token } = data.body;
+    //const data = await spotifyApi.refreshAccessToken();
+   // const { access_token } = data.body;
     
-    await User.updateSpotifyAccessToken(user.user_id, access_token);
+    //await User.updateSpotifyAccessToken(user.user_id, access_token);
     
-    res.json({ message: 'Spotify token refreshed successfully' });
-  } catch (error) {
-    console.error('Error refreshing Spotify token:', error);
-    res.status(500).json({ message: 'Error refreshing Spotify token', error: error.message });
-  }
-});
+    //res.json({ message: 'Spotify token refreshed successfully' });
+  //} catch (error) {
+    //console.error('Error refreshing Spotify token:', error);
+    //res.status(500).json({ message: 'Error refreshing Spotify token', error: error.message });
+  //}
+//});
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAudio } from '../../AudioContext';
+//import { useAudio } from '../../AudioContext';
 import './feed.css';
 
 export default function Feed() {
@@ -9,7 +9,7 @@ export default function Feed() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { playSong: playAudio } = useAudio();
+  //const { playSong: playAudio } = useAudio();
 
   useEffect(() => {
     fetchFeedItems();
@@ -31,7 +31,7 @@ export default function Feed() {
     }
   };
 
-  const playSong = async (id) => {
+  /*const playSong = async (id) => {
     try {
       const response = await axios.get(`http://localhost:3000/api/songs/${id}`, {
         headers: {
@@ -43,7 +43,7 @@ export default function Feed() {
     } catch (error) {
       console.error('Error playing song:', error);
     }
-  };
+  };*/
 
   const viewPlaylist = (id) => {
     navigate(`/playlist/${id}`);
@@ -65,9 +65,9 @@ export default function Feed() {
               <div className="feed-item-content">
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>
-                {item.type === 'song' && (
-                  <button onClick={() => playSong(item.id)}>Play</button>
-                )}
+                {item.type === 'song'
+                  //<button onClick={() => playSong(item.id)}>Play</button>
+                }
                 {item.type === 'playlist' && (
                   <button onClick={() => viewPlaylist(item.id)}>View Playlist</button>
                 )}

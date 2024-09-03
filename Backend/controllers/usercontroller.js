@@ -136,6 +136,8 @@ exports.loginUser = async (req, res) => {
         return res.status(400).json({ message: 'Username and password are required' });
     }
 
+    console.log("in backend 2");
+
     try {
         const foundUser = await user.getUserByUsername(username);
         if (!foundUser) {

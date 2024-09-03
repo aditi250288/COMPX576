@@ -10,6 +10,7 @@ import Playlist from "../Playlists/Playlist";
 import ProtectedRoute from "../../components/protectedRoutes";
 import Register from "../register/register";
 import NotFound from "../../components/notFound/notFound";
+import LoginForm from "../login/LoginForm";
 
 export default function Home() {
     return (
@@ -17,7 +18,7 @@ export default function Home() {
             <div className="main-body">
                 <Routes>
                     <Route path="/" element={<Navigate replace to="/login" />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={<LoginForm />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
                     <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />

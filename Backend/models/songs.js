@@ -31,30 +31,43 @@ class Song {
     }
   }
 
-  static async createSong(songData) {
-    try {
-      const [result] = await pool.query('INSERT INTO songs SET ?', songData);
-      return result.insertId;
-    } catch (error) {
-      throw error;
-    }
-  }
+  //static async song(songData) {
+    //try {
+     //const [result] = await pool.query('INSERT INTO songs SET ?', songData);
+      //return result.insertId;
+    //} catch (error) {
+    //  throw error;
+    //}
+  //}
 
-  static async updateSong(id, songData) {
-    try {
-      const [result] = await pool.query('UPDATE songs SET ? WHERE song_id = ?', [songData, id]);
-      return result.affectedRows;
-    } catch (error) {
-      throw error;
-    }
-  }
+  //static async updateSong(id, songData) {
+   // try {
+    //  const [result] = await pool.query('UPDATE songs SET ? WHERE song_id = ?', [songData, id]);
+     // return result.affectedRows;
+    //} catch (error) {
+     // throw error;
+    //}
+  //}
 
-  static async deleteSong(id) {
+  //static async deleteSong(id) {
+    //try {
+      //const [result] = await pool.query('DELETE FROM songs WHERE song_id = ?', [id]);
+      //return result.affectedRows;
+    //} catch (error) {
+    //  throw error;
+    //}
+  //}
+
+  static async create(name, thumbnail, track) {
+    const connection = await pool.getConnection();
     try {
-      const [result] = await pool.query('DELETE FROM songs WHERE song_id = ?', [id]);
-      return result.affectedRows;
-    } catch (error) {
-      throw error;
+      const [result] = await connection.execute(
+        'INSERT INTO songs (name, thumbnail, track) VALUES (?, ?, ?)',
+        [name, thumbnail, track]
+      );
+      return new Song(result.insertId, name, thumbnail, track);
+    } finally {
+      connection.release();
     }
   }
 
